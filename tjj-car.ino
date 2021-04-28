@@ -1,29 +1,36 @@
+//introduce global variables for the selection of loops in void 
+// not using boolean because we would need three of them and writing them all correct in every scenario is a mess
+int speed1 = 0; 
+// are led is red so why not go with that
+int red = 2;
+//easier to remember for ultrasonic sensor
+int echoPin = 7;
+int trigPin = 8;
+// distance values for rotating and backing up
+int d1 = 30;
+int d2 = 15;
+// for the measurements
+long duration, cm;
+
 void setup() {
-
-  int red = 2;
-
+  
   // initialize serial communication:
   Serial.begin(9600);
-  pinMode(red, OUTPUT);
   pinMode(10, OUTPUT);
   pinMode(9, OUTPUT);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, OUTPUT);
   pinMode(6, OUTPUT);
   pinMode(5, OUTPUT);
   pinMode(4, OUTPUT);
   pinMode(3, OUTPUT);
+  pinMode(red, OUTPUT);
 }
 
 void loop() {
-  // establish variables
-  long duration, cm;
+ 
   // The sensor is triggered by a HIGH pulse of 10 or more microseconds.
   // Give a short LOW pulse beforehand to ensure a clean HIGH pulse:
-  const int echoPin = 7;
-  const int trigPin = 8;
-  int red = 2;
-  int speed1;
-  int speed2;
-
   pinMode(trigPin, OUTPUT);
   digitalWrite(trigPin, LOW);
 
@@ -38,60 +45,23 @@ void loop() {
 
   // convert the time into a distance
   cm = (duration / 2) / 29.1;
+  //distance over 30cm -> full throttle 
 
-  if (cm < 15) {
-    digitalWrite(red, HIGH);
-
-    if (speed1 != -50) {
-      //less than 15 cm
-      //motor 1
-
-
-      for (int i = 128; i >= 0; i--) {
-        analogWrite(10, i);
-        delay(10);
-      }
-
-      digitalWrite(6, LOW);
-      digitalWrite(5, HIGH);
-      digitalWrite(4, LOW);
-      digitalWrite(3, HIGH);
-      for (int i = 0; i < 128; i++) {
-        analogWrite(9, i);
-        analogWrite(10, i);
-        delay(10);
-      }
-      //delay(10);
-      //analogWrite(9, 50);
-      //digitalWrite(6, LOW);
-      //digitalWrite(5, HIGH);
-      speed1 = -50;
-      //motor 2
-      //for (int i=64; i>=0; i--) {
-      //analogWrite(10, i);
-      //delay(10);
-      //}
-      //for (int i=0; i<64; i++) { analogWrite(10, i); delay(10); }
-      //analogWrite(10, 50);
-      //digitalWrite(4, LOW);
-      //digitalWrite(3, HIGH);
-    }
-  }
-
-  if (cm > 30) {
+    if (cm > d1) {
     // turn of the light
     digitalWrite(red, LOW);
     delay(10);
+    //is already at full throttle pass this if-loop
     if (speed1 != 50) {
+      // slow down the dc motors
       analogWrite(10, 128);
-
       analogWrite(9, 128);
       for (int i = 128; i >= 0; i--) {
         analogWrite(9, i);
         analogWrite(10, i);
         delay(10);
       }
-      //analogWrite(9, 50);
+      //choose direction and accelerate
       digitalWrite(6, HIGH);
       digitalWrite(5, LOW);
       digitalWrite(4, HIGH);
@@ -101,50 +71,68 @@ void loop() {
         analogWrite(10, i);
         delay(10);
       }
+      //write to avoid going through previous loop again
       speed1 = 50;
-      // motor 1
-      //digitalWrite(6, HIGH);
-      //digitalWrite(5, LOW);
-      //motor 2
-      //analogWrite(10, 50);
-      //digitalWrite(4, HIGH);
-      //digitalWrite(3, LOW);
+     
     }
   }
-
-  if (cm > 15 && cm < 30) {
+  //distance measurement between 15 and 30
+  if (cm > d2 && cm < d1) {
     digitalWrite(red, LOW);
+    //condition to go through loop
     if (speed1 != 40) {
-      for (int i = 255; i >= 0; i--) {
+      //slow down the motors
+      for (int i = 128; i >= 0; i--) {
         analogWrite(9, i);
         analogWrite(10, i);
         delay(10);
       }
-      //analogWrite(9, 50);
-      //between 10 and 30 cm
-      //motor 1
+      //choose rotation direction
       digitalWrite(6, LOW);
       digitalWrite(5, LOW);
       digitalWrite(4, HIGH);
       digitalWrite(3, LOW);
+      //write variable to avoid looping
       speed1 = 40;
+      //accelerate the motors
       for (int i = 0; i < 128; i++) {
         analogWrite(9, i);
         analogWrite(10, i);
         delay(10);
       }
-      //motor 2
-      //analogWrite(10, 50);
-      //digitalWrite(6, LOW);
-      //digitalWrite(5, LOW);
-      //digitalWrite(4, HIGH);
-      //digitalWrite(3, LOW);
-
-      //  for (int i=0; i<50; i++) { analogWrite(9, i); delay(100); }
+      
     }
   }
 
+if (cm < d2) {
+   //turn on the warning light
+    digitalWrite(red, HIGH);
+    //check if loop condition is met
+    if (speed1 != -50) {
+      
 
+      //slow down the motors
+      for (int i = 128; i >= 0; i--) {
+        analogWrite(10, i);
+        delay(10);
+      }
+      //choose the direction
+      digitalWrite(6, LOW);
+      digitalWrite(5, HIGH);
+      digitalWrite(4, LOW);
+      digitalWrite(3, HIGH);
+      for (int i = 0; i < 128; i++) {
+        analogWrite(9, i);
+        analogWrite(10, i);
+        delay(10);
+      }
+      //write the variable to avoid loop
+      speed1 = -50;
+     
+    }
+  }
+
+  //print distance for testing
   Serial.print(cm);
   Serial.print("cm");
   Serial.println();
