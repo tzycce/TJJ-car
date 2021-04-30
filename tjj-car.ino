@@ -1,36 +1,33 @@
-//introduce global variables for the selection of loops in void 
-// not using boolean because we would need three of them and writing them all correct in every scenario is a mess
+//introduce global variables for the selection of loops in void and led
 int speed1 = 0; 
-// are led is red so why not go with that
 int red = 2;
-//easier to remember for ultrasonic sensor
-int echoPin = 7;
-int trigPin = 8;
 // distance values for rotating and backing up
 int d1 = 30;
 int d2 = 15;
-// for the measurements
-long duration, cm;
+int limit1 = 128;
+int limit2 = 128;
 
 void setup() {
   
   // initialize serial communication:
   Serial.begin(9600);
+  pinMode(red, OUTPUT);
   pinMode(10, OUTPUT);
   pinMode(9, OUTPUT);
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, OUTPUT);
   pinMode(6, OUTPUT);
   pinMode(5, OUTPUT);
   pinMode(4, OUTPUT);
   pinMode(3, OUTPUT);
-  pinMode(red, OUTPUT);
 }
 
 void loop() {
- 
+  // establish variables
+  long duration, cm;
   // The sensor is triggered by a HIGH pulse of 10 or more microseconds.
   // Give a short LOW pulse beforehand to ensure a clean HIGH pulse:
+  const int echoPin = 7;
+  const int trigPin = 8;
+ 
   pinMode(trigPin, OUTPUT);
   digitalWrite(trigPin, LOW);
 
@@ -54,9 +51,9 @@ void loop() {
     //is already at full throttle pass this if-loop
     if (speed1 != 50) {
       // slow down the dc motors
-      analogWrite(10, 128);
-      analogWrite(9, 128);
-      for (int i = 128; i >= 0; i--) {
+      analogWrite(10, limit2);
+      analogWrite(9, limit2);
+      for (int i = limit2; i >= 0; i--) {
         analogWrite(9, i);
         analogWrite(10, i);
         delay(10);
@@ -66,7 +63,7 @@ void loop() {
       digitalWrite(5, LOW);
       digitalWrite(4, HIGH);
       digitalWrite(3, LOW);
-      for (int i = 0; i < 255; i++) {
+      for (int i = 0; i < limit1; i++) {
         analogWrite(9, i);
         analogWrite(10, i);
         delay(10);
@@ -82,7 +79,7 @@ void loop() {
     //condition to go through loop
     if (speed1 != 40) {
       //slow down the motors
-      for (int i = 128; i >= 0; i--) {
+      for (int i = limit2; i >= 0; i--) {
         analogWrite(9, i);
         analogWrite(10, i);
         delay(10);
@@ -95,7 +92,7 @@ void loop() {
       //write variable to avoid looping
       speed1 = 40;
       //accelerate the motors
-      for (int i = 0; i < 128; i++) {
+      for (int i = 0; i < limit2; i++) {
         analogWrite(9, i);
         analogWrite(10, i);
         delay(10);
@@ -112,7 +109,7 @@ if (cm < d2) {
       
 
       //slow down the motors
-      for (int i = 128; i >= 0; i--) {
+      for (int i = limit2; i >= 0; i--) {
         analogWrite(10, i);
         delay(10);
       }
@@ -121,7 +118,7 @@ if (cm < d2) {
       digitalWrite(5, HIGH);
       digitalWrite(4, LOW);
       digitalWrite(3, HIGH);
-      for (int i = 0; i < 128; i++) {
+      for (int i = 0; i < limit2; i++) {
         analogWrite(9, i);
         analogWrite(10, i);
         delay(10);
