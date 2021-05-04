@@ -2,10 +2,10 @@
 int speed1 = 0; 
 int red = 2;
 // distance values for rotating and backing up
-int d1 = 30;
-int d2 = 15;
-int limit1 = 128;
-int limit2 = 128;
+int d1 = 80;
+int d2 = 1;
+int limit1 = 255;
+int limit2 = 192;
 
 void setup() {
   
@@ -51,13 +51,13 @@ void loop() {
     //is already at full throttle pass this if-loop
     if (speed1 != 50) {
       // slow down the dc motors
-      analogWrite(10, limit2);
-      analogWrite(9, limit2);
-      for (int i = limit2; i >= 0; i--) {
-        analogWrite(9, i);
-        analogWrite(10, i);
-        delay(10);
-      }
+     // analogWrite(10, limit2);
+     // analogWrite(9, limit2);
+     // for (int i = 64; i >= 0; i--) {
+     //   analogWrite(9, i);
+     //   analogWrite(10, i);
+     //   delay(10);
+     // }
       //choose direction and accelerate
       digitalWrite(6, HIGH);
       digitalWrite(5, LOW);
@@ -75,33 +75,40 @@ void loop() {
   }
   //distance measurement between 15 and 30
   if (cm > d2 && cm < d1) {
-    digitalWrite(red, LOW);
+    digitalWrite(red, HIGH);
     //condition to go through loop
     if (speed1 != 40) {
       //slow down the motors
-      for (int i = limit2; i >= 0; i--) {
+      for (int i = 64; i >= 0; i--) {
         analogWrite(9, i);
         analogWrite(10, i);
         delay(10);
       }
       //choose rotation direction
       digitalWrite(6, LOW);
-      digitalWrite(5, LOW);
+      digitalWrite(5, HIGH);
       digitalWrite(4, HIGH);
       digitalWrite(3, LOW);
       //write variable to avoid looping
-      speed1 = 40;
+      speed1 = 30;
       //accelerate the motors
-      for (int i = 0; i < limit2; i++) {
+      //for (int i = 64; i < 192; i++) {
+      //  analogWrite(9, i);
+      //  analogWrite(10, i);
+      //  delay(10);
+      //}
+      analogWrite(9, 192);
+      analogWrite(10, 192);
+      for (int i = 192; i >= 0; i--) {
         analogWrite(9, i);
         analogWrite(10, i);
-        delay(10);
+        delay(5);
       }
-      
+      delay(500);
     }
   }
 
-if (cm < d2) {
+/*if (cm < d2) {
    //turn on the warning light
     digitalWrite(red, HIGH);
     //check if loop condition is met
@@ -128,7 +135,7 @@ if (cm < d2) {
      
     }
   }
-
+*/
   //print distance for testing
   Serial.print(cm);
   Serial.print("cm");
